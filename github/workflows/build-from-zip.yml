@@ -1,0 +1,49 @@
+name: Build debug APK (bootstrap from zip)
+
+# One-file bootstrap: downloads the full Luncher project zip, unpacks it
+# into the workspace, then builds the debug APK with the project's
+# toolchain (JDK 17, Android SDK 35, Gradle 8.14.3).
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download project zip
+        run: curl -L --fail -o project.zip "https://muse.ai/files/1377884202075430/1845254639837207/rc1to4r185v4mwe31s7223l5/luncher-oneui-upload.zip"
+
+      - name: Unpack project
+        run: unzip -o project.zip && rm project.zip
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: luncher-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
