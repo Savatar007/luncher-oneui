@@ -1,0 +1,6 @@
+// Top-level build file. Plugin versions are declared here once;
+// settings.gradle (pluginManagement / dependencyResolutionManagement) stays separate.
+plugins {
+    id 'com.android.application' version '8.13.0' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.24' apply false
+}
